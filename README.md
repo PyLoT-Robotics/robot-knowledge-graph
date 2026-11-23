@@ -4,7 +4,7 @@ English · [日本語](docs/README.ja.md)
 
 A small Python library for managing rooms, objects, people, robots and their
 relationships, with YAML/JSON, LLM-oriented text and PDDL problem exports.
-This extraction is currently private. The Python core requires neither ROS nor
+The Python core requires neither ROS nor
 an LLM service. The ROS package and Python import name remain
 `pylot_knowledge_graph` for compatibility.
 

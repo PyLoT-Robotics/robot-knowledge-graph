@@ -3,7 +3,7 @@
 [English](../README.md) · 日本語
 
 部屋・物体・人物・ロボットと関係を管理し、YAML/JSON、LLM用テキスト、PDDL問題へ
-変換する小さなPythonライブラリです。privateリポジトリとして切り出しています。
+変換する小さなPythonライブラリです。独立したOSSとして切り出しています。
 PythonコアはROS・LLMサービスに依存しません。既存のROSパッケージ名
 `pylot_knowledge_graph` とPython import名を保持しています。
 
