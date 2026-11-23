@@ -1,13 +1,16 @@
 # Robot Knowledge Graph
 
-部屋・物体・人物・ロボットと関係を管理し、YAML/JSON、LLM用テキスト、PDDL問題へ
-変換する小さなPythonライブラリです。privateリポジトリとして切り出しています。
-PythonコアはROS・LLMサービスに依存しません。既存のROSパッケージ名
-`pylot_knowledge_graph` とPython import名を保持しています。
+English · [日本語](docs/README.ja.md)
+
+A small Python library for managing rooms, objects, people, robots and their
+relationships, with YAML/JSON, LLM-oriented text and PDDL problem exports.
+This extraction is currently private. The Python core requires neither ROS nor
+an LLM service. The ROS package and Python import name remain
+`pylot_knowledge_graph` for compatibility.
 
 ## Install and use without ROS
 
-Python 3.10+。リポジトリのルートで実行します。
+Requires Python 3.10+. Run these commands from the repository root.
 
 ```bash
 python3 -m venv .venv
@@ -19,8 +22,8 @@ python -m pylot_knowledge_graph config/sample_environment.yaml --format prompt -
 python -m pylot_knowledge_graph config/sample_environment.yaml --format pddl --output problem.pddl
 ```
 
-`robot-knowledge-graph` も同じCLIです。ROSのcolconでインストールした場合は
-`ros2 run pylot_knowledge_graph robot-knowledge-graph` から呼べます。
+`robot-knowledge-graph` provides the same CLI. With a colcon installation, invoke
+it as `ros2 run pylot_knowledge_graph robot-knowledge-graph`.
 
 ```python
 from pylot_knowledge_graph.graph import KnowledgeGraph, KGNode, KGEdge
@@ -33,24 +36,29 @@ world.add_edge(KGEdge('robot_at', 'robot', 'kitchen'))
 print(PromptSerializer.serialize_full(world))
 ```
 
-CRUD、種類・関係ごとの検索、隣接ノード検索、双方向エッジ、ノード削除時の関連エッジ削除、
-YAML読み書きに対応します。YAML文書の重複ノードはエラーにします。
-ノードを先に登録してからエッジを追加してください。
+The library supports CRUD operations, queries by type or relationship, neighbor
+queries, bidirectional edges, removal of incident edges when deleting a node,
+and YAML loading/saving. Duplicate nodes in YAML documents are rejected.
+Register nodes before adding edges between them.
 
 ## PDDL scope
 
-`config/domain.pddl` は元実装のサンプルドメインです。PDDL出力は問題生成であり、
-計画探索・実行・ドメインとの意味的整合性検証は行いません。対応するドメインを
-自分で用意してください。名前・型・述語の記号、名前の大文字小文字衝突、述語の
-引数個数の混在を検査します。自己ループは1項述語、その他のエッジは2項述語として
-出力し、`is_goal: true` のエッジは初期事実でなくゴールに使います。
-数値関数・任意個数の引数・時間制約は扱いません。`--goal` で渡す式は呼び出し側で
-正しいPDDLにしてください。LLM向けテキスト出力にLLM呼び出しは含まれません。
+`config/domain.pddl` is the original implementation's sample domain. PDDL export
+generates a problem definition; it does not search for plans, execute them or
+validate semantic compatibility with a domain. Supply a matching domain yourself.
+The exporter checks name/type/predicate symbols, case-insensitive node-name
+collisions and inconsistent predicate arities. Self-loops become unary predicates;
+other edges become binary predicates. Edges marked `is_goal: true` become goals
+rather than initial facts.
+
+Numeric functions, arbitrary predicate arities and temporal constraints are not
+supported. Expressions supplied through `--goal` must already be valid PDDL.
+Generating LLM-oriented text does not call an LLM.
 
 ## Optional ROS 2 adapter
 
-ROS 2 Jazzy上でビルドできます。ROSを使用する場合は通常のROSワークスペースのsrcに
-このリポジトリを置いてください。`rclpy`、`std_msgs`、`std_srvs`、PyYAMLとlaunchが必要です。
+The package builds on ROS 2 Jazzy. Place the repository in a regular ROS workspace's
+`src` directory. The adapter requires `rclpy`, `std_msgs`, `std_srvs`, PyYAML and launch.
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -60,14 +68,15 @@ ros2 launch pylot_knowledge_graph knowledge_graph.launch.py
 ros2 service call /knowledge_graph_node/query std_srvs/srv/Trigger '{}'
 ```
 
-取得サービス: `~/query`, `~/get_prompt`, `~/get_pddl_problem`, `~/get_summary`。
-更新入力は `std_msgs/String` のJSONトピック `~/add_node_request`, `~/remove_node_request`,
-`~/add_edge_request`, `~/remove_edge_request`。結果は `~/operation_response` に返ります。
-元ノードとの互換性を保持し、リクエストID付きサービスへの変更は行っていません。
-永続化はPythonの `GraphLoader.save_to_yaml` で明示的に行います。
+Read services: `~/query`, `~/get_prompt`, `~/get_pddl_problem`, `~/get_summary`.
+Mutations arrive as JSON in `std_msgs/String` on `~/add_node_request`,
+`~/remove_node_request`, `~/add_edge_request` and `~/remove_edge_request`.
+Responses are published on `~/operation_response`. This retains the original
+node's interface; it has not been migrated to services with request IDs.
+Persist changes explicitly with Python's `GraphLoader.save_to_yaml`.
 
 ## License and provenance
 
-元パッケージのMIT表記を引き継いでいます。詳細は [LICENSE](LICENSE) と
-[PROVENANCE.md](PROVENANCE.md)。実機接続や外部サービスを必要としないテストと、
-独立したpipインストールを検証しています。
+The original package's MIT license is retained. See [LICENSE](LICENSE) and
+[PROVENANCE.md](PROVENANCE.md). Tests and independent pip installation have been
+validated without robot hardware or external services.
