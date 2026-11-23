@@ -1,0 +1,144 @@
+# PyLoT RoboCup 2025 - サンプル環境定義
+# omni_plan のデモに着想を得た家庭環境のグラフ初期状態
+
+nodes:
+  # ロボット
+  - name: pylot
+    type: robot
+    properties:
+      description: "PyLoT RoboCup service robot"
+
+  # 部屋
+  - name: entrance
+    type: room
+    properties:
+      x: 2.87
+      y: 1.36
+  - name: living_room
+    type: room
+    properties:
+      x: 2.50
+      y: 2.00
+  - name: kitchen
+    type: room
+    properties:
+      x: 7.28
+      y: 2.65
+  - name: bedroom
+    type: room
+  - name: bathroom
+    type: room
+
+  # 家具
+  - name: sofa
+    type: furniture
+    properties:
+      x: 2.50
+      y: 2.00
+  - name: kitchen_table
+    type: furniture
+  - name: living_room_table
+    type: furniture
+  - name: cabinet
+    type: furniture
+    properties:
+      x: 2.15
+      y: 1.72
+  - name: seat_1
+    type: furniture
+    properties:
+      type: "chair"
+      description: "Left seat in the living room"
+  - name: seat_2
+    type: furniture
+    properties:
+      type: "chair"
+      description: "Center seat in the living room"
+  - name: seat_3
+    type: furniture
+    properties:
+      type: "chair"
+      description: "Right seat in the living room"
+
+  # 物体
+  - name: apple
+    type: object
+    properties:
+      category: fruit
+  - name: candy_box
+    type: object
+    properties:
+      category: snack
+  - name: cup
+    type: object
+    properties:
+      category: kitchenware
+
+edges:
+  # 部屋の接続関係 (双方向)
+  - label: connected_to
+    source: entrance
+    target: living_room
+    bidirectional: true
+  - label: connected_to
+    source: living_room
+    target: kitchen
+    bidirectional: true
+  - label: connected_to
+    source: living_room
+    target: bedroom
+    bidirectional: true
+  - label: connected_to
+    source: bedroom
+    target: bathroom
+    bidirectional: true
+
+  # 家具の配置
+  - label: is_in
+    source: sofa
+    target: living_room
+  - label: is_in
+    source: kitchen_table
+    target: kitchen
+  - label: is_in
+    source: living_room_table
+    target: living_room
+  - label: is_in
+    source: cabinet
+    target: kitchen
+  - label: is_in
+    source: seat_1
+    target: living_room
+  - label: is_in
+    source: seat_2
+    target: living_room
+  - label: is_in
+    source: seat_3
+    target: living_room
+
+  # 空席状態 (1項述語としてエッジのsourceとtargetを同一にする)
+  - label: is_empty
+    source: seat_1
+    target: seat_1
+  - label: is_empty
+    source: seat_2
+    target: seat_2
+  - label: is_empty
+    source: seat_3
+    target: seat_3
+
+  # 物体の配置
+  - label: on_top_of
+    source: apple
+    target: kitchen_table
+  - label: on_top_of
+    source: candy_box
+    target: living_room_table
+  - label: on_top_of
+    source: cup
+    target: kitchen_table
+
+  # ロボットの初期位置
+  - label: robot_at
+    source: pylot
+    target: entrance
